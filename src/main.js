@@ -380,12 +380,23 @@ function previewGlyph(id) {
     </svg>`;
   }
   return `<svg viewBox="0 0 48 48" aria-hidden="true">
-    <path d="M14 30 L17 45 L21 34 z" fill="#fff8f0" stroke="#7a1424" stroke-width="1.5"/>
-    <path d="M34 30 L31 45 L27 34 z" fill="#fff8f0" stroke="#7a1424" stroke-width="1.5"/>
-    <circle cx="18" cy="19" r="4" fill="#2a0208"/>
-    <circle cx="30" cy="19" r="4" fill="#2a0208"/>
-    <circle cx="19.5" cy="19" r="1.6" fill="#ffea00"/>
-    <circle cx="31.5" cy="19" r="1.6" fill="#ffea00"/>
+    <path d="M7 15 Q11 3 24 7 Q37 3 41 15 Q35 11.5 31.5 12.5 L26 8 L24 15 L22 8 L16.5 12.5 Q13 11.5 7 15 Z"
+      fill="#2a0510"/>
+    <path d="M18 32 Q24 37 30 32" fill="none" stroke="#2a0208" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M12 31 Q12.5 44 16.5 46.5 Q19.5 37 18.5 31.5 Z" fill="#fff8f0" stroke="#7a1424"
+      stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M36 31 Q35.5 44 31.5 46.5 Q28.5 37 29.5 31.5 Z" fill="#fff8f0" stroke="#7a1424"
+      stroke-width="1.5" stroke-linejoin="round"/>
+    <ellipse cx="17.5" cy="22" rx="5.2" ry="4.3" fill="#2a0208"/>
+    <ellipse cx="30.5" cy="22" rx="5.2" ry="4.3" fill="#2a0208"/>
+    <circle cx="17.5" cy="22" r="2.7" fill="#ff2b45"/>
+    <circle cx="30.5" cy="22" r="2.7" fill="#ff2b45"/>
+    <ellipse cx="17.5" cy="22" rx="1" ry="2.2" fill="#150208"/>
+    <ellipse cx="30.5" cy="22" rx="1" ry="2.2" fill="#150208"/>
+    <circle cx="18.9" cy="20.6" r="1" fill="#ffffff" opacity="0.9"/>
+    <circle cx="31.9" cy="20.6" r="1" fill="#ffffff" opacity="0.9"/>
+    <path d="M11.5 15.5 L21 19" stroke="#2a0510" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M36.5 15.5 L27 19" stroke="#2a0510" stroke-width="2.6" stroke-linecap="round"/>
   </svg>`;
 }
 
