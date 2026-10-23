@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Battle Simulator — Ball Battles</title>
+<link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ================= SELECTION SCREEN ================= -->
+  <section id="menuScreen" class="screen menu-screen">
+
+    <header class="menu-head">
+      <h1 class="logo">
+        <span class="logo-battle">BATTLE</span>
+        <span class="logo-sim">SIMULATOR</span>
+      </h1>
+      <p class="logo-sub">Pick two fighters, then press play.</p>
+    </header>
+
+    <div class="picker">
+
+      <div class="side-panel" data-side="left">
+        <div class="side-head">
+          <span class="side-tag">Player 1</span>
+          <span class="side-arrow">→</span>
+        </div>
+        <div class="roster" data-roster="left"></div>
+      </div>
+
+      <div class="vs-column">
+        <div class="vs-slot">
+          <canvas id="vsLeft" class="vs-canvas"></canvas>
+        </div>
+        <div class="vs-badge">VS</div>
+        <div class="vs-slot">
+          <canvas id="vsRight" class="vs-canvas"></canvas>
+        </div>
+      </div>
+
+      <div class="side-panel" data-side="right">
+        <div class="side-head">
+          <span class="side-arrow">←</span>
+          <span class="side-tag">Player 2</span>
+        </div>
+        <div class="roster" data-roster="right"></div>
+      </div>
+
+    </div>
+
+    <footer class="menu-foot">
+      <button id="randomBtn" class="btn btn-ghost" type="button">Random matchup</button>
+
+      <div class="play-wrap">
+        <button id="playBtn" class="btn btn-play" type="button" disabled>PLAY</button>
+        <span id="readyHint" class="ready-hint">Pick a fighter for each side</span>
+      </div>
+
+      <button id="soundBtn" class="btn btn-ghost" type="button">Sound: on</button>
+    </footer>
+  </section>
+
+  <!-- ================= BATTLE SCREEN ================= -->
+  <section id="battleScreen" class="screen battle-screen is-hidden">
+
+    <div class="battle-top">
+      <button id="menuBtn" class="btn btn-ghost btn-small" type="button">← Matchup</button>
+      <div class="battle-titles">
+        <span id="battleA" class="battle-name">Player 1</span>
+        <span class="battle-vs">vs</span>
+        <span id="battleB" class="battle-name">Player 2</span>
+      </div>
+      <div class="battle-hint">Space = pause · Esc = matchup</div>
+    </div>
+
+    <div id="stageWrap" class="stage-wrap">
+      <canvas id="stage" class="stage"></canvas>
+
+      <div id="pauseOverlay" class="overlay is-hidden">
+        <div class="overlay-card">
+          <h2 class="overlay-title">PAUSED</h2>
+          <button id="resumeBtn" class="btn btn-play" type="button">RESUME</button>
+        </div>
+      </div>
+
+      <div id="resultOverlay" class="overlay is-hidden">
+        <div class="overlay-card result-card">
+          <h2 id="resultTitle" class="result-title">WINNER</h2>
+          <p id="resultSub" class="result-sub"></p>
+          <table class="result-table" id="resultTable"></table>
+          <div class="overlay-actions">
+            <button id="rematchBtn" class="btn btn-play" type="button">REMATCH</button>
+            <button id="newMatchupBtn" class="btn btn-ghost" type="button">New matchup</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-strip">
+      <div id="statA" class="stat-card"></div>
+      <div id="statB" class="stat-card"></div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ================= SCRIPTS ================= -->
+<script src="src/config.js"></script>
+<script src="src/utils.js"></script>
+<script src="src/sfx.js"></script>
+<script src="src/effects.js"></script>
+<script src="src/ball.js"></script>
+<script src="src/electricity-ball.js"></script>
+<script src="src/vampire-ball.js"></script>
+<script src="src/verity-ball.js"></script>
+<script src="src/fighters.js"></script>
+<script src="src/arena.js"></script>
+<script src="src/main.js"></script>
+</body>
+</html>
