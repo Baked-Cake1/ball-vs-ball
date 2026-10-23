@@ -224,22 +224,53 @@ class VerityBall extends Ball {
     ctx.fillStyle = monster ? '#2a0008' : '#3a2a00';
 
     if (monster) {
-      /* angry, slanted eyes */
+      /* angry, slanted eyes with glowing crimson irises */
       for (const s of [-1, 1]) {
         ctx.save();
         ctx.translate(s * eyeX, eyeY);
-        ctx.rotate(s * 0.42);
+        ctx.rotate(s * 0.38);
+
+        /* dark socket */
+        ctx.fillStyle = '#2a0008';
         ctx.beginPath();
-        ctx.ellipse(0, 0, eyeR * 1.25, eyeR * 0.85 * eyeScale, 0, 0, TAU);
+        ctx.ellipse(0, 0, eyeR * 1.35, eyeR * 1.05 * eyeScale, 0, 0, TAU);
+        ctx.fill();
+
+        /* hot red iris */
+        const iris = ctx.createRadialGradient(0, 0, eyeR * 0.08, 0, 0, eyeR * 0.95);
+        iris.addColorStop(0, '#ff8fa3');
+        iris.addColorStop(0.55, '#ff2d55');
+        iris.addColorStop(1, '#7a0a1e');
+        ctx.fillStyle = iris;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, eyeR * 0.8, eyeR * 0.62 * eyeScale, 0, 0, TAU);
+        ctx.fill();
+
+        /* slit pupil */
+        ctx.fillStyle = '#180006';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, eyeR * 0.28, eyeR * 0.52 * eyeScale, 0, 0, TAU);
         ctx.fill();
         ctx.restore();
       }
+
       /* a hot glint in each eye */
-      ctx.fillStyle = '#ff2d55';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
       for (const s of [-1, 1]) {
         ctx.beginPath();
-        ctx.arc(s * eyeX, eyeY, eyeR * 0.34, 0, TAU);
+        ctx.arc(s * eyeX + eyeR * 0.32, eyeY - eyeR * 0.34, eyeR * 0.2, 0, TAU);
         ctx.fill();
+      }
+
+      /* heavy angry brows, crashing down toward the nose */
+      ctx.strokeStyle = '#2a0008';
+      ctx.lineWidth = r * 0.115;
+      ctx.lineCap = 'round';
+      for (const s of [-1, 1]) {
+        ctx.beginPath();
+        ctx.moveTo(s * (eyeX + eyeR * 1.55), eyeY - eyeR * 1.5);
+        ctx.lineTo(s * (eyeX - eyeR * 0.85), eyeY - eyeR * 0.55);
+        ctx.stroke();
       }
     } else {
       for (const s of [-1, 1]) {
@@ -258,40 +289,85 @@ class VerityBall extends Ball {
     ctx.strokeStyle = monster ? '#2a0008' : '#3a2a00';
 
     if (monster) {
-      /* a wide, jagged horror grin filled with teeth */
-      const w = r * 0.72;
-      const h = r * 0.5;
+      /* a wide, jagged horror grin — clipped so the teeth can never poke
+         outside the head */
+      ctx.save();
       ctx.beginPath();
-      ctx.moveTo(-w, mouthY - h * 0.25);
-      ctx.quadraticCurveTo(0, mouthY + h * 1.15, w, mouthY - h * 0.25);
+      ctx.arc(0, 0, r * 0.985, 0, TAU);
+      ctx.clip();
+
+      const w = r * 0.62;          // half-width of the grin
+      const topY = r * 0.14;       // lip height at the corners
+      const botY = r * 0.24;
+      const topMid = r * 0.42;     // lip sag at the centre
+      const botMid = r * 0.82;
+      const topCtrl = 2 * topMid - topY;
+      const botCtrl = 2 * botMid - botY;
+
+      /* points on the two lips (quadratic from -w to +w) */
+      const topCurve = (t) => ({
+        x: (1 - t) * (1 - t) * -w + t * t * w,
+        y: (1 - t) * (1 - t) * topY + 2 * (1 - t) * t * topCtrl + t * t * topY,
+      });
+      const botCurve = (t) => ({
+        x: (1 - t) * (1 - t) * -w + t * t * w,
+        y: (1 - t) * (1 - t) * botY + 2 * (1 - t) * t * botCtrl + t * t * botY,
+      });
+
+      /* dark interior */
+      ctx.beginPath();
+      ctx.moveTo(-w, topY);
+      ctx.quadraticCurveTo(0, topCtrl, w, topY);
+      ctx.lineTo(w, botY);
+      ctx.quadraticCurveTo(0, botCtrl, -w, botY);
       ctx.closePath();
       ctx.fillStyle = '#2a0008';
       ctx.fill();
 
-      /* teeth: a row of triangles along the top and bottom of the grin */
+      /* interlocking zigzag teeth, sized to the local gap between the lips */
+      const N = 6;
+      const depth = (t) => {
+        const gap = botCurve(t).y - topCurve(t).y;
+        return gap * (0.42 + 0.06 * Math.sin(Math.PI * t));
+      };
       ctx.fillStyle = '#fff8e0';
-      const teeth = 6;
-      for (let i = 0; i < teeth; i++) {
-        const t0 = i / teeth;
-        const t1 = (i + 0.5) / teeth;
-        const t2 = (i + 1) / teeth;
-        const px = (t) => -w + 2 * w * t;
-        const py = (t) => mouthY - h * 0.25 + (h * 1.15) * (1 - Math.pow(2 * t - 1, 2)) * 0.5;
-        /* upper fang */
+      ctx.strokeStyle = 'rgba(70, 8, 18, 0.5)';
+      ctx.lineWidth = r * 0.02;
+
+      /* top row: teeth hanging down from the upper lip */
+      for (let i = 0; i < N; i++) {
+        const t0 = i / N;
+        const t1 = (i + 0.5) / N;
+        const t2 = (i + 1) / N;
+        const a = topCurve(t0);
+        const apex = topCurve(t1);
+        const b = topCurve(t2);
         ctx.beginPath();
-        ctx.moveTo(px(t0), py(t0));
-        ctx.lineTo(px(t1), py(t1) + h * 0.34);
-        ctx.lineTo(px(t2), py(t2));
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(apex.x, apex.y + depth(t1));
+        ctx.lineTo(b.x, b.y);
         ctx.closePath();
         ctx.fill();
-        /* lower fang */
-        ctx.beginPath();
-        ctx.moveTo(px(t0), py(t0) + h * 0.62);
-        ctx.lineTo(px(t1), py(t1) + h * 0.28);
-        ctx.lineTo(px(t2), py(t2) + h * 0.62);
-        ctx.closePath();
-        ctx.fill();
+        ctx.stroke();
       }
+
+      /* bottom row: offset half a tooth so the rows interlock */
+      for (let i = 0; i < N - 1; i++) {
+        const t0 = (i + 0.5) / N;
+        const t1 = (i + 1) / N;
+        const t2 = (i + 1.5) / N;
+        const a = botCurve(t0);
+        const apex = botCurve(t1);
+        const b = botCurve(t2);
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(apex.x, apex.y - depth(t1));
+        ctx.lineTo(b.x, b.y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+      }
+      ctx.restore();
     } else if (displeased) {
       /* a sullen frown */
       const w = r * 0.5;
