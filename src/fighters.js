@@ -38,6 +38,18 @@ const FIGHTERS = [
     className: 'VerityBall',
     create(opts) { return new VerityBall(this, opts); },
   },
+  {
+    id: 'berserker',
+    name: 'Berserker Ball',
+    tagline: 'Last Stand',
+    blurb: 'Contact damage that grows as its health falls — feeble at full strength, devastating on its last legs.',
+    color: '#ff6a1e',
+    accent: '#ffd0a0',
+    ballColor: '#ff7a26',
+    maxHealth: 800,
+    className: 'BerserkerBall',
+    create(opts) { return new BerserkerBall(this, opts); },
+  },
 ];
 
 const FighterRegistry = {
