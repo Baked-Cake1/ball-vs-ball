@@ -80,4 +80,20 @@ const CONFIG = {
     damageEventWindow: 0.2,
     touchSlack: 0,          // contact only — no extra reach
   },
+
+  /* Berserker Ball ability "Last Stand":
+     a pure contact bruiser like Verity — no reach, just damage every time it
+     touches the opponent — but its damage is driven by how much health it has
+     LOST. A full-health Berserker hits for almost nothing; a nearly dead one
+     hits like a truck. Scales linearly in between. Grab it (vampire grip) and
+     it lashes out mid-hold. Balance-tuned against the whole roster
+     (round-robin win rates land ~40-55% vs every fighter). */
+  BERSERKER: {
+    damageFull: 14,         // contact damage at 100% health
+    damageEmpty: 218,       // contact damage as health approaches 0
+    contactCooldown: 0.45,  // min seconds between two contact hits
+    gripLashCooldown: 1.5,  // min seconds between two strikes while grabbed
+    gripLashFactor: 0.875,  // a swing while grabbed lands wild (damage factor)
+    touchSlack: 0,          // contact only — no extra reach
+  },
 };

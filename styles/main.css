@@ -13,6 +13,7 @@
   --cyan: #7df9ff;
   --red: #c8102e;
   --pink: #ff6b7f;
+  --orange: #ff8a3d;
   --gold: #ffd166;
 }
 
@@ -266,6 +267,7 @@ html, body {
 }
 .chip-shock { color: var(--cyan); }
 .chip-bite { color: var(--pink); }
+.chip-rage { color: var(--orange); }
 
 /* ---------------------------------------------------------- overlays */
 

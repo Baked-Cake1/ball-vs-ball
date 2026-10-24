@@ -313,13 +313,15 @@ const Game = {
     if (!el) return;
     const shock = ball.status.shock ? '<span class="chip chip-shock">shocked</span>' : '';
     const biting = ball.volley ? '<span class="chip chip-bite">biting</span>' : '';
+    const raging = typeof ball.ragePct === 'number' && ball.ragePct >= 0.5
+      ? '<span class="chip chip-rage">raging</span>' : '';
     el.innerHTML = `
       <div class="stat-row"><span>Health</span><b>${Utils.fmt(ball.health)}</b></div>
       <div class="stat-row"><span>Damage dealt</span><b>${Utils.fmt(ball.damageDealt)}</b></div>
       <div class="stat-row"><span>Damage taken</span><b>${Utils.fmt(ball.damageTaken)}</b></div>
       <div class="stat-row"><span>Stolen health</span><b>${Utils.fmt(ball.healed)}</b></div>
       <div class="stat-row"><span>Hits landed</span><b>${ball.hitsLanded}</b></div>
-      <div class="stat-flags">${shock}${biting}</div>
+      <div class="stat-flags">${shock}${biting}${raging}</div>
     `;
   },
 
@@ -377,6 +379,21 @@ function previewGlyph(id) {
       <circle cx="31" cy="19" r="4" fill="#3a2a00"/>
       <path d="M13 29 Q24 41 35 29" fill="none" stroke="#3a2a00" stroke-width="3.4"
         stroke-linecap="round"/>
+    </svg>`;
+  }
+  if (id === 'berserker') {
+    /* angry horned face with gritted teeth */
+    return `<svg viewBox="0 0 48 48" aria-hidden="true">
+      <path d="M9 13 Q5 3 13 3 Q17 5 17 11 Z" fill="#4a1800"/>
+      <path d="M39 13 Q43 3 35 3 Q31 5 31 11 Z" fill="#4a1800"/>
+      <path d="M8 15 L21 21" stroke="#4a1800" stroke-width="3.4" stroke-linecap="round"/>
+      <path d="M40 15 L27 21" stroke="#4a1800" stroke-width="3.4" stroke-linecap="round"/>
+      <ellipse cx="16" cy="25" rx="5.2" ry="4.4" fill="#2a0c00"/>
+      <ellipse cx="32" cy="25" rx="5.2" ry="4.4" fill="#2a0c00"/>
+      <circle cx="16" cy="25" r="2.4" fill="#ff8a2a"/>
+      <circle cx="32" cy="25" r="2.4" fill="#ff8a2a"/>
+      <rect x="12" y="33" width="24" height="9" rx="2.4" fill="#fff3dc" stroke="#7a2c00" stroke-width="1.6"/>
+      <path d="M18 33 V42 M24 33 V42 M30 33 V42" stroke="#7a2c00" stroke-width="1.5"/>
     </svg>`;
   }
   return `<svg viewBox="0 0 48 48" aria-hidden="true">
