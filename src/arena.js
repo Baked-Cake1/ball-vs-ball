@@ -394,82 +394,223 @@ class Arena {
 
   drawBackground(ctx) {
     const w = this.w, h = this.h, pad = this.pad;
+    const cx = w / 2, cy = h / 2;
 
+    /* deep-space floor: indigo up top fading to near-black at the bottom */
     const sky = ctx.createLinearGradient(0, 0, 0, h);
-    sky.addColorStop(0, '#0b1026');
-    sky.addColorStop(0.55, '#131a3a');
-    sky.addColorStop(1, '#080b1a');
+    sky.addColorStop(0, '#0c1230');
+    sky.addColorStop(0.45, '#121a42');
+    sky.addColorStop(1, '#060814');
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, w, h);
 
-    /* floor grid inside the walls */
+    /* soft arena light pooling toward the middle */
+    const light = ctx.createRadialGradient(cx, cy, 30, cx, cy, w * 0.7);
+    light.addColorStop(0, 'rgba(100, 155, 255, 0.14)');
+    light.addColorStop(0.5, 'rgba(70, 110, 220, 0.05)');
+    light.addColorStop(1, 'rgba(50, 70, 150, 0)');
+    ctx.fillStyle = light;
+    ctx.fillRect(0, 0, w, h);
+
     ctx.save();
     ctx.beginPath();
     ctx.rect(pad, pad, w - pad * 2, h - pad * 2);
     ctx.clip();
 
-    const cell = 62;
-    ctx.strokeStyle = 'rgba(120, 170, 255, 0.09)';
+    /* floor grid — minor cells keep the floor from feeling empty */
+    ctx.strokeStyle = 'rgba(120, 170, 255, 0.075)';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    for (let x = pad; x <= w - pad; x += cell) { ctx.moveTo(x, pad); ctx.lineTo(x, h - pad); }
-    for (let y = pad; y <= h - pad; y += cell) { ctx.moveTo(pad, y); ctx.lineTo(w - pad, y); }
+    for (let x = 50; x < w; x += 50) {
+      if (x % 250 === 0) continue;
+      ctx.moveTo(x, pad); ctx.lineTo(x, h - pad);
+    }
+    for (let y = 50; y < h; y += 50) {
+      if (y % 250 === 0) continue;
+      ctx.moveTo(pad, y); ctx.lineTo(w - pad, y);
+    }
     ctx.stroke();
 
-    /* centre marks */
-    ctx.strokeStyle = 'rgba(140, 190, 255, 0.18)';
+    /* major lines burn brighter near the centre of the floor */
+    const gridGlow = ctx.createRadialGradient(cx, cy, 40, cx, cy, w * 0.62);
+    gridGlow.addColorStop(0, 'rgba(130, 185, 255, 0.2)');
+    gridGlow.addColorStop(1, 'rgba(130, 185, 255, 0.04)');
+    ctx.strokeStyle = gridGlow;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for (const x of [250, 750]) { ctx.moveTo(x, pad); ctx.lineTo(x, h - pad); }
+    for (const y of [250, 750]) { ctx.moveTo(pad, y); ctx.lineTo(w - pad, y); }
+    /* centre cross */
+    ctx.moveTo(cx, pad); ctx.lineTo(cx, h - pad);
+    ctx.moveTo(pad, cy); ctx.lineTo(w - pad, cy);
+    ctx.stroke();
+
+    /* centre emblem: glowing disc, ringed with tick marks */
+    ctx.save();
+    ctx.translate(cx, cy);
+    const disc = ctx.createRadialGradient(0, 0, 0, 0, 0, 130);
+    disc.addColorStop(0, 'rgba(90, 150, 255, 0.10)');
+    disc.addColorStop(1, 'rgba(90, 150, 255, 0)');
+    ctx.fillStyle = disc;
+    ctx.beginPath(); ctx.arc(0, 0, 130, 0, TAU); ctx.fill();
+
+    ctx.strokeStyle = 'rgba(130, 185, 255, 0.22)';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(0, 0, 118, 0, TAU); ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(130, 185, 255, 0.28)';
+    ctx.beginPath();
+    for (let i = 0; i < 24; i++) {
+      const a = (i / 24) * TAU;
+      const r0 = i % 6 === 0 ? 104 : 110;
+      ctx.moveTo(Math.cos(a) * r0, Math.sin(a) * r0);
+      ctx.lineTo(Math.cos(a) * 118, Math.sin(a) * 118);
+    }
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(130, 185, 255, 0.14)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(0, 0, 78, 0, TAU); ctx.stroke();
+
+    ctx.fillStyle = 'rgba(150, 200, 255, 0.35)';
+    ctx.beginPath(); ctx.arc(0, 0, 5, 0, TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(150, 200, 255, 0.3)';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.arc(w / 2, h / 2, 120, 0, TAU);
+    for (let i = 0; i < 4; i++) {
+      const a = (i / 4) * TAU;
+      ctx.moveTo(Math.cos(a) * 16, Math.sin(a) * 16);
+      ctx.lineTo(Math.cos(a) * 30, Math.sin(a) * 30);
+    }
     ctx.stroke();
+    ctx.restore();
+
+    /* court-style quarter arcs tucked into each corner */
+    ctx.strokeStyle = 'rgba(130, 185, 255, 0.14)';
+    ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(w / 2, h / 2 - 40);
-    ctx.lineTo(w / 2, h / 2 + 40);
+    ctx.arc(pad, pad, 90, 0, Math.PI / 2);
+    ctx.arc(w - pad, pad, 90, Math.PI / 2, Math.PI);
+    ctx.arc(w - pad, h - pad, 90, Math.PI, Math.PI * 1.5);
+    ctx.arc(pad, h - pad, 90, Math.PI * 1.5, TAU);
     ctx.stroke();
 
-    const glow = ctx.createRadialGradient(w / 2, h / 2, 60, w / 2, h / 2, w * 0.62);
-    glow.addColorStop(0, 'rgba(90, 140, 255, 0.10)');
-    glow.addColorStop(1, 'rgba(90, 140, 255, 0)');
-    ctx.fillStyle = glow;
-    ctx.fillRect(pad, pad, w - pad * 2, h - pad * 2);
+    /* neon spill — light from the rails pooling onto the floor */
+    const spill = 120;
+    let sg = ctx.createLinearGradient(0, pad, 0, pad + spill);
+    sg.addColorStop(0, 'rgba(80, 170, 255, 0.11)');
+    sg.addColorStop(1, 'rgba(80, 170, 255, 0)');
+    ctx.fillStyle = sg;
+    ctx.fillRect(pad, pad, w - pad * 2, spill);
+
+    sg = ctx.createLinearGradient(0, h - pad, 0, h - pad - spill);
+    sg.addColorStop(0, 'rgba(80, 170, 255, 0.11)');
+    sg.addColorStop(1, 'rgba(80, 170, 255, 0)');
+    ctx.fillStyle = sg;
+    ctx.fillRect(pad, h - pad - spill, w - pad * 2, spill);
+
+    sg = ctx.createLinearGradient(pad, 0, pad + spill, 0);
+    sg.addColorStop(0, 'rgba(80, 170, 255, 0.11)');
+    sg.addColorStop(1, 'rgba(80, 170, 255, 0)');
+    ctx.fillStyle = sg;
+    ctx.fillRect(pad, pad, spill, h - pad * 2);
+
+    sg = ctx.createLinearGradient(w - pad, 0, w - pad - spill, 0);
+    sg.addColorStop(0, 'rgba(80, 170, 255, 0.11)');
+    sg.addColorStop(1, 'rgba(80, 170, 255, 0)');
+    ctx.fillStyle = sg;
+    ctx.fillRect(w - pad - spill, pad, spill, h - pad * 2);
     ctx.restore();
+
+    /* vignette: keep the eye on the action */
+    const vin = ctx.createRadialGradient(cx, cy, w * 0.38, cx, cy, w * 0.76);
+    vin.addColorStop(0, 'rgba(3, 5, 12, 0)');
+    vin.addColorStop(1, 'rgba(3, 5, 12, 0.55)');
+    ctx.fillStyle = vin;
+    ctx.fillRect(0, 0, w, h);
   }
 
   drawWalls(ctx) {
     const w = this.w, h = this.h, pad = this.pad;
+    const t = this.time;
+
+    /* beveled frame: each band is lit on its outer edge and shaded inward */
+    let g = ctx.createLinearGradient(0, 0, 0, pad);
+    g.addColorStop(0, '#2a3560');
+    g.addColorStop(0.35, '#1c2547');
+    g.addColorStop(1, '#10162e');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, pad);
+
+    g = ctx.createLinearGradient(0, h - pad, 0, h);
+    g.addColorStop(0, '#10162e');
+    g.addColorStop(0.65, '#1c2547');
+    g.addColorStop(1, '#2a3560');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, h - pad, w, pad);
+
+    g = ctx.createLinearGradient(0, 0, pad, 0);
+    g.addColorStop(0, '#2a3560');
+    g.addColorStop(0.35, '#1c2547');
+    g.addColorStop(1, '#10162e');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, pad, h);
+
+    g = ctx.createLinearGradient(w - pad, 0, w, 0);
+    g.addColorStop(0, '#10162e');
+    g.addColorStop(0.65, '#1c2547');
+    g.addColorStop(1, '#2a3560');
+    ctx.fillStyle = g;
+    ctx.fillRect(w - pad, 0, pad, h);
+
+    /* panel seams, like plating along the frame */
+    ctx.strokeStyle = 'rgba(8, 12, 28, 0.5)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let x = 125; x < w; x += 125) {
+      ctx.moveTo(x, 3); ctx.lineTo(x, pad - 3);
+      ctx.moveTo(x, h - pad + 3); ctx.lineTo(x, h - 3);
+    }
+    for (let y = 125; y < h; y += 125) {
+      ctx.moveTo(3, y); ctx.lineTo(pad - 3, y);
+      ctx.moveTo(w - pad + 3, y); ctx.lineTo(w - 3, y);
+    }
+    ctx.stroke();
+
+    /* the neon rail breathes very gently against the dark contact line */
+    const pulse = 0.72 + 0.18 * Math.sin(t * 1.5);
+    ctx.strokeStyle = 'rgba(4, 8, 20, 0.8)';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(pad - 0.5, pad - 0.5, w - pad * 2 + 1, h - pad * 2 + 1);
 
     ctx.save();
-    /* outer band */
-    ctx.fillStyle = '#1b2444';
-    ctx.fillRect(0, 0, w, pad);
-    ctx.fillRect(0, h - pad, w, pad);
-    ctx.fillRect(0, pad, pad, h - pad * 2);
-    ctx.fillRect(w - pad, pad, pad, h - pad * 2);
-
-    /* metallic sheen */
-    const band = ctx.createLinearGradient(0, 0, 0, pad);
-    band.addColorStop(0, 'rgba(255,255,255,0.16)');
-    band.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = band;
-    ctx.fillRect(0, 0, w, pad);
-
-    /* glowing inner lip */
-    ctx.strokeStyle = 'rgba(120, 200, 255, 0.55)';
+    ctx.strokeStyle = `rgba(150, 215, 255, ${0.85 * pulse})`;
     ctx.lineWidth = 3;
     ctx.shadowColor = 'rgba(100, 190, 255, 0.9)';
-    ctx.shadowBlur = 20;
-    ctx.strokeRect(pad - 1.5, pad - 1.5, w - pad * 2 + 3, h - pad * 2 + 3);
-    ctx.shadowBlur = 0;
-
-    /* corner caps */
-    ctx.fillStyle = 'rgba(150, 220, 255, 0.75)';
-    const cap = pad * 0.5;
-    for (const [cx, cy] of [[pad, pad], [w - pad, pad], [pad, h - pad], [w - pad, h - pad]]) {
-      ctx.beginPath();
-      ctx.arc(cx, cy, cap, 0, TAU);
-      ctx.fill();
-    }
+    ctx.shadowBlur = 18 * pulse;
+    ctx.strokeRect(pad - 1, pad - 1, w - pad * 2 + 2, h - pad * 2 + 2);
     ctx.restore();
+
+    /* softer inner rail, one step in from the bright one */
+    ctx.strokeStyle = `rgba(110, 185, 255, ${0.3 * pulse})`;
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(pad + 5, pad + 5, w - pad * 2 - 10, h - pad * 2 - 10);
+
+    /* glowing corner nodes where the rails meet */
+    for (const [cx, cy] of [[pad, pad], [w - pad, pad], [pad, h - pad], [w - pad, h - pad]]) {
+      const halo = ctx.createRadialGradient(cx, cy, 0, cx, cy, 26);
+      halo.addColorStop(0, `rgba(140, 210, 255, ${0.5 * pulse})`);
+      halo.addColorStop(1, 'rgba(140, 210, 255, 0)');
+      ctx.fillStyle = halo;
+      ctx.beginPath(); ctx.arc(cx, cy, 26, 0, TAU); ctx.fill();
+
+      ctx.strokeStyle = 'rgba(170, 220, 255, 0.8)';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.arc(cx, cy, 9, 0, TAU); ctx.stroke();
+
+      ctx.fillStyle = '#bfe6ff';
+      ctx.beginPath(); ctx.arc(cx, cy, 4.5, 0, TAU); ctx.fill();
+    }
   }
 
   /** Crackling electricity sheet drawn over a shocked fighter. */
@@ -584,8 +725,11 @@ class Arena {
     ctx.fillStyle = 'rgba(8, 12, 28, 0.85)';
     ctx.strokeStyle = 'rgba(140, 200, 255, 0.5)';
     ctx.lineWidth = 2;
+    ctx.shadowColor = 'rgba(90, 160, 255, 0.45)';
+    ctx.shadowBlur = 18;
     Utils.roundRect(ctx, -52, -20, 104, 40, 12);
     ctx.fill();
+    ctx.shadowBlur = 0;
     ctx.stroke();
     ctx.fillStyle = '#cfe6ff';
     ctx.font = '900 22px "Segoe UI", system-ui, sans-serif';
@@ -652,7 +796,7 @@ class Arena {
 
     ctx.font = '700 15px "Segoe UI", system-ui, sans-serif';
     ctx.fillStyle = 'rgba(200, 225, 255, 0.7)';
-    ctx.textAlign = mirror ? 'left' : 'right';
+    ctx.textAlign = 'right';
     ctx.fillText(`${Utils.fmt(ball.health)} / ${ball.maxHealth}`, w, -12);
 
     ctx.textAlign = mirror ? 'right' : 'left';
